@@ -1,56 +1,46 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('qr-input');
-    const generateBtn = document.getElementById('generate-btn');
-    const qrDisplay = document.getElementById('qr-display');
-    const downloadBtn = document.getElementById('download-btn');
-
-    generateBtn.addEventListener('click', generateQRCode);
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            generateQRCode();
+function generateQRCode() {
+    let data = document.getElementById("data").value;
+    if (!data) {
+        alert("Please enter text or URL");
+        return;
+    }
+    eel.generate_qr_web(data)(function(base64) {
+        console.log(base64);
+        if (base64) {
+            setImage(base64);
+        } else {
+            alert("Failed to generate QR code");
         }
     });
+}
 
-    async function generateQRCode() {
-        const text = input.value.trim();
-        if (!text) {
-            alert('Please enter a URL or text');
-            return;
-        }
+function setImage(base64) {
+    let data = document.getElementById("data").value;
+    const qrImage = document.getElementById("qr");
+    const downloadBtn = document.getElementById("download-btn");
+    const qrSection = document.querySelector(".qr-section");
+    
+    qrImage.src = base64;
+    qrImage.style.display = "block";
+    qrImage.style.margin = "0 auto"; // Center the image horizontally
+    downloadBtn.style.display = "block";
+    qrSection.style.display = "flex"; // Changed to flex for better centering
+    qrSection.style.flexDirection = "column";
+    qrSection.style.alignItems = "center";
+    qrSection.style.justifyContent = "center"; // Center vertically within section
+    
+    downloadBtn.onclick = function() {
+        const link = document.createElement("a");
+        link.href = base64;
+        link.download = `qr-${data}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+}
 
-        try {
-            const response = await fetch('/generate-qr', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ data: text })
-            });
-
-            if (!response.ok) throw new Error('Failed to generate QR code');
-
-            const data = await response.json();
-            const img = document.createElement('img');
-            img.src = data.qr_code;
-            img.alt = 'Generated QR Code';
-
-            qrDisplay.innerHTML = '';
-            qrDisplay.appendChild(img);
-            downloadBtn.classList.remove('hidden');
-
-            // Setup download button
-            downloadBtn.onclick = () => {
-                const link = document.createElement('a');
-                link.download = 'qr-code.png';
-                link.href = data.qr_code;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to generate QR code. Please try again.');
-        }
-    }
-});
+window.onload = function() {
+    document.getElementById("qr").style.display = "none";
+    document.getElementById("download-btn").style.display = "none";
+    document.querySelector(".qr-section").style.display = "none";
+};
