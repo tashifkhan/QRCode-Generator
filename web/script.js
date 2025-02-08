@@ -22,12 +22,12 @@ function setImage(base64) {
     
     qrImage.src = base64;
     qrImage.style.display = "block";
-    qrImage.style.margin = "0 auto"; // Center the image horizontally
+    qrImage.style.margin = "0 auto"; 
     downloadBtn.style.display = "block";
-    qrSection.style.display = "flex"; // Changed to flex for better centering
+    qrSection.style.display = "flex"; 
     qrSection.style.flexDirection = "column";
     qrSection.style.alignItems = "center";
-    qrSection.style.justifyContent = "center"; // Center vertically within section
+    qrSection.style.justifyContent = "center"; 
     
     downloadBtn.onclick = function() {
         const link = document.createElement("a");
