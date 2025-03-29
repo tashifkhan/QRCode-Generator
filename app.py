@@ -1,4 +1,5 @@
-from qr_generator import generate_qr, generate_upi_qr
+from qr_generator import generate_qr
+from qr_generator.web_upi_handler import generate_upi_web
 import eel
 
 eel.init('web')
@@ -14,7 +15,7 @@ def generate_qr_web(data):
 @eel.expose
 def generate_upi_qr_web(upi_id, display_name, amount):
     try:
-        return generate_upi_qr(upi_id, display_name, amount)
+        return generate_upi_web(upi_id, display_name, amount)
     except Exception as e:
         print(f"Error generating UPI QR code: {str(e)}")
         return None
