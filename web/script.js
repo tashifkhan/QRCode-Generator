@@ -4,8 +4,15 @@ function generateQRCode() {
         alert("Please enter text or URL");
         return;
     }
+    
+    // Show loading spinner
+    showLoader("main-loader");
+
     try {
         eel.generate_qr_web(data)(function(base64) {
+            // Hide loader
+            hideLoader("main-loader");
+            
             console.log(base64);
             if (base64) {
                 setImage(base64);
@@ -16,12 +23,20 @@ function generateQRCode() {
     } catch (error) {
         if (error instanceof ReferenceError && error.message.includes("eel")) {
             generateQRWithPyodide(data)
-                .then(base64 => setImage(base64))
+                .then(base64 => {
+                    // Hide loader
+                    hideLoader("main-loader");
+                    setImage(base64);
+                })
                 .catch(err => {
+                    // Hide loader
+                    hideLoader("main-loader");
                     console.error("Error with Pyodide fallback:", err);
                     alert("Failed to generate QR code: " + err.message);
                 });
         } else {
+            // Hide loader
+            hideLoader("main-loader");
             console.error("Error generating QR code:", error);
             alert("Failed to generate QR code: " + error.message);
         }
@@ -114,8 +129,14 @@ function generateURLQR() {
         return;
     }
     
+    // Show loading spinner
+    showLoader("url-loader");
+    
     try {
         eel.generate_qr_web(urlText)(function(base64) {
+            // Hide loader
+            hideLoader("url-loader");
+            
             if (base64) {
                 setImage(base64, urlText);
                 closeModal("urlModal");
@@ -127,14 +148,20 @@ function generateURLQR() {
         if (error instanceof ReferenceError && error.message.includes("eel")) {
             generateQRWithPyodide(urlText)
                 .then(base64 => {
+                    // Hide loader
+                    hideLoader("url-loader");
                     setImage(base64, urlText);
                     closeModal("urlModal");
                 })
                 .catch(err => {
+                    // Hide loader
+                    hideLoader("url-loader");
                     console.error("Error with Pyodide fallback:", err);
                     alert("Failed to generate QR code: " + err.message);
                 });
         } else {
+            // Hide loader
+            hideLoader("url-loader");
             console.error("Error generating URL QR code:", error);
             alert("Failed to generate QR code: " + error.message);
         }
@@ -166,8 +193,14 @@ function generateUPIQR() {
         amount = amount + ".00";
     }
     
+    // Show loading spinner
+    showLoader("upi-loader");
+    
     try {
         eel.generate_upi_qr_web(upiId, displayName, amount)(function(base64) {
+            // Hide loader
+            hideLoader("upi-loader");
+            
             if (base64) {
                 let filename = `upi-${upiId.replace('@', '-')}`;
                 setImage(base64, filename);
@@ -183,15 +216,21 @@ function generateUPIQR() {
             
             generateQRWithPyodide(upiString)
                 .then(base64 => {
+                    // Hide loader
+                    hideLoader("upi-loader");
                     let filename = `upi-${upiId.replace('@', '-')}`;
                     setImage(base64, filename);
                     closeModal("upiModal");
                 })
                 .catch(err => {
+                    // Hide loader
+                    hideLoader("upi-loader");
                     console.error("Error with Pyodide fallback:", err);
                     alert("Failed to generate UPI QR code: " + err.message);
                 });
         } else {
+            // Hide loader
+            hideLoader("upi-loader");
             console.error("Error generating UPI QR code:", error);
             alert("Failed to generate UPI QR code: " + error.message);
         }
@@ -220,6 +259,21 @@ function setImage(base64, filename = "qr-code") {
         link.click();
         document.body.removeChild(link);
     };
+}
+
+// Helper functions for showing/hiding loader
+function showLoader(loaderId) {
+    const loaderWrapper = document.getElementById(loaderId);
+    if (loaderWrapper) {
+        loaderWrapper.style.display = "flex";
+    }
+}
+
+function hideLoader(loaderId) {
+    const loaderWrapper = document.getElementById(loaderId);
+    if (loaderWrapper) {
+        loaderWrapper.style.display = "none";
+    }
 }
 
 window.onload = function() {

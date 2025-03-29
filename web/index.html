@@ -15,6 +15,13 @@
             <button type="button" class="url-btn" onclick="showURLModal()">URL/Text QR</button>
             <button type="button" class="upi-btn" onclick="showUPIModal()">UPI QR</button>
         </div>
+        
+        <!-- Main loader -->
+        <div id="main-loader" class="loader-wrapper">
+            <div class="loader"></div>
+            <div class="loader-text">Creating your QR code...</div>
+        </div>
+        
         <div class="qr-section">
             <img id="qr" src="" alt="QR Code will appear here">
             <button id="download-btn" class="download-btn" style="display: none;">Download QR Code</button>
@@ -30,6 +37,13 @@
                 <label for="url-text">URL or Text</label>
                 <input type="text" id="url-text" placeholder="Enter URL or text...">
             </div>
+            
+            <!-- URL loader -->
+            <div id="url-loader" class="loader-wrapper">
+                <div class="loader"></div>
+                <div class="loader-text">Creating your QR code...</div>
+            </div>
+            
             <button type="button" class="modal-btn url-modal-btn" onclick="generateURLQR()">Generate QR Code</button>
         </div>
     </div>
@@ -57,6 +71,13 @@
                 </div>
                 <input type="text" id="amount" placeholder="0.00" disabled>
             </div>
+            
+            <!-- UPI loader -->
+            <div id="upi-loader" class="loader-wrapper">
+                <div class="loader"></div>
+                <div class="loader-text">Creating your UPI QR code...</div>
+            </div>
+            
             <button type="button" class="modal-btn upi-modal-btn" onclick="generateUPIQR()">Generate UPI QR</button>
         </div>
     </div>
