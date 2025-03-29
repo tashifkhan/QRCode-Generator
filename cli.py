@@ -17,7 +17,18 @@ def main():
     args = parser.parse_args()
     
     if not args.url and not args.upi:
-        parser.error("Either URL or --upi must be provided")
+        if input("No URL or UPI ID provided. \nDo you want to generate a UPI QR code? (y/n): ").lower().strip() == 'y':
+            generate_upi_qr()
+        else:
+            if input("Do you want to generate a QR code from a URL? (y/n): ").lower().strip() == 'y':
+                args.url = input("Enter the URL: ")
+                generate_qr(args.url, display=True)
+                if input("Do you want to save the QR code? (y/n): ").lower().strip() == 'y':
+                    save_path = input("Enter the path to save the QR code: ")
+                    generate_qr(args.url, display=False, save_path=save_path)
+            else:
+                print("No URL or UPI ID provided. Exiting.")
+                sys.exit(1)
     
     # If neither save nor display is specified, set display to True
     should_display = args.display or (not args.save and not args.display)
