@@ -43,30 +43,66 @@ function generateQRCode() {
     }
 }
 
+// Global variables to track Pyodide loading
+let pyodideReadyPromise = null;
+let isPyodideLoading = false;
+
+// Function to preload Pyodide and required packages
+async function preloadPyodide() {
+    if (pyodideReadyPromise) return pyodideReadyPromise;
+    
+    // Set flag to indicate loading is in progress
+    isPyodideLoading = true;
+    
+    // Create the promise for loading Pyodide
+    pyodideReadyPromise = (async () => {
+        try {
+            console.log("Preloading Pyodide...");
+            // Add script to load Pyodide if not already present
+            if (!document.querySelector('script[src*="pyodide.js"]')) {
+                const script = document.createElement("script");
+                script.src = "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
+                document.head.appendChild(script);
+                
+                // Wait for script to load
+                await new Promise((resolve, reject) => {
+                    script.onload = resolve;
+                    script.onerror = reject;
+                });
+            }
+            
+            const pyodide = await loadPyodide();
+            console.log("Pyodide loaded, installing packages...");
+            
+            // Load and install required packages
+            await pyodide.loadPackage("micropip");
+            await pyodide.runPythonAsync(`
+                import micropip
+                await micropip.install("qrcode")
+                await micropip.install("pillow")
+                print("All packages installed successfully")
+            `);
+            
+            console.log("Pyodide and all required packages are ready");
+            return pyodide;
+        } catch (error) {
+            console.error("Failed to preload Pyodide:", error);
+            // Reset the promise so we can try again later
+            pyodideReadyPromise = null;
+            throw error;
+        } finally {
+            isPyodideLoading = false;
+        }
+    })();
+    
+    return pyodideReadyPromise;
+}
+
 // New helper function to generate QR codes using Pyodide
 async function generateQRWithPyodide(data) {
-    // Check if we need to load Pyodide
-    if (typeof pyodide === 'undefined') {
-        // Add script to load Pyodide if not already present
-        const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
-        document.head.appendChild(script);
-        
-        // Wait for script to load
-        await new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = reject;
-        });
-    }
-    
     try {
-        const pyodide = await loadPyodide();
-        await pyodide.loadPackage("micropip");
-        await pyodide.runPythonAsync(`
-            import micropip
-            await micropip.install("qrcode")
-            await micropip.install("pillow")
-        `);
+        // Use the preloaded Pyodide instance if available, otherwise load it
+        const pyodide = await preloadPyodide();
         
         // Escape any quotes in the data to prevent Python syntax errors
         const safeData = data.replace(/"/g, '\\"');
@@ -280,6 +316,9 @@ window.onload = function() {
     document.getElementById("qr").style.display = "none";
     document.getElementById("download-btn").style.display = "none";
     document.querySelector(".qr-section").style.display = "none";
+    
+    // Start preloading Pyodide in the background
+    preloadPyodide().catch(err => console.warn("Preloading Pyodide failed, will retry when needed:", err));
     
     // Toggle functionality for amount field
     const amountToggle = document.getElementById("amount-toggle");
