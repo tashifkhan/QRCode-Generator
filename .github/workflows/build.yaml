@@ -1,0 +1,110 @@
+name: Build and Release Executables
+
+on:
+  push:
+    tags:
+      - "v*" # Trigger when pushing a tag like v1.0.0
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest] # Builds for Linux, macOS, Windows
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: |
+          pip install uv
+
+      - name: Install Dependencies
+        run: |
+          uv pip install -r requirements.txt
+          uv pip install pyinstaller
+
+      - name: Build CLI Executable (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          pyinstaller --onefile --name qrcode-cli main.py
+          chmod +x dist/qrcode-cli
+
+      - name: Build GUI Executable (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          pyinstaller --onefile --name qrcode-gui app.py
+          chmod +x dist/qrcode-gui
+
+      - name: Build CLI Executable (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --onefile --name qrcode-cli main.py
+        shell: pwsh
+
+      - name: Build GUI Executable (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --onefile --name qrcode-gui app.py
+        shell: pwsh
+
+      - name: Create Zip Archives (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p zip_dist
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            cp dist/qrcode-cli zip_dist/qrcode-cli
+            cp dist/qrcode-gui zip_dist/qrcode-gui
+            cd zip_dist && zip -r ../dist/qrcode-linux.zip qrcode-cli qrcode-gui
+            # Remove the raw executables, keeping only the zip
+            rm -f ../dist/qrcode-cli ../dist/qrcode-gui
+          fi
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            cp dist/qrcode-cli zip_dist/qrcode-cli
+            cp dist/qrcode-gui zip_dist/qrcode-gui
+            cd zip_dist && zip -r ../dist/qrcode-mac.zip qrcode-cli qrcode-gui
+            # Remove the raw executables, keeping only the zip
+            rm -f ../dist/qrcode-cli ../dist/qrcode-gui
+          fi
+        shell: bash
+
+      - name: Create Zip Archives (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Compress-Archive -Path dist/qrcode-cli.exe, dist/qrcode-gui.exe -DestinationPath dist/qrcode-windows.zip
+        shell: pwsh
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrcode-${{ runner.os }}
+          path: |
+            dist/*.zip
+            dist/*.exe
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: build # Run after the build job
+
+    steps:
+      - name: Download all Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/**/*
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
