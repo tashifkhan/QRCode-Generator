@@ -24,7 +24,20 @@ def main():
                 args.url = input("Enter the URL: ")
                 generate_qr(args.url, display=True)
                 if input("Do you want to save the QR code? (y/n): ").lower().strip() == 'y':
-                    save_path = input("Enter the path to save the QR code: ")
+                    print("The path should contain the file name and extension.")
+                    print("Example: /path/to/qr_code.png")
+                    print("If no path is provided, the QR code will be saved in the Downloads folder.")
+                    print()
+                    save_path = input("Enter the path to save the QR code ")
+                    if not save_path:
+                        home_dir = os.path.expanduser("~")
+                        downloads_folder = os.path.join(home_dir, "Downloads")
+                        filename = f"qr_code_{args.url.replace('http://', '').replace('https://', '').replace('/', '_')}.png"
+                        save_path = os.path.join(downloads_folder, filename)
+                        if not os.path.exists(downloads_folder):
+                            os.makedirs(downloads_folder)
+                    else:
+                        save_path = os.path.abspath(save_path)
                     generate_qr(args.url, display=False, save_path=save_path)
             else:
                 print("No URL or UPI ID provided. Exiting.")
