@@ -5,6 +5,19 @@ from base64 import b64encode
 from PIL import Image
 
 def generate_qr(data, display=False, save_path=None):
+    """
+    Generate a QR code from input data with options to display and save
+    Args:
+        data (str or convertible to str): Content to encode in the QR code
+        display (bool, optional): Whether to display the QR code. Defaults to False.
+        save_path (str, optional): Path where to save the QR code image. If relative,
+                                   will be converted to absolute path. Defaults to None.
+    Returns:
+        str: Base64 encoded data URI string of the QR code image
+    Raises:
+        ValueError: If data is None, empty, or not convertible to string
+    """
+    
 
     if data is None:
         raise ValueError("Error: QR code data cannot be None")

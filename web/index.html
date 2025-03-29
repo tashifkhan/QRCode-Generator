@@ -10,15 +10,56 @@
 <body>
     <div class="container">
         <h1>QR Code Generator</h1>
-        <div class="input-section">
-            <input type="text" id="data" placeholder="Enter text or URL...">
-            <button type="button" onclick="generateQRCode()">Generate QR</button>
+        <div class="button-section">
+            <button type="button" class="url-btn" onclick="showURLModal()">URL/Text QR</button>
+            <button type="button" class="upi-btn" onclick="showUPIModal()">UPI QR</button>
         </div>
         <div class="qr-section">
             <img id="qr" src="" alt="QR Code will appear here">
             <button id="download-btn" class="download-btn" style="display: none;">Download QR Code</button>
         </div>
     </div>
+    
+    <!-- URL Modal -->
+    <div id="urlModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="urlModal">&times;</span>
+            <h2>Generate URL/Text QR Code</h2>
+            <div class="modal-input-group">
+                <label for="url-text">URL or Text</label>
+                <input type="text" id="url-text" placeholder="Enter URL or text...">
+            </div>
+            <button type="button" class="modal-btn url-modal-btn" onclick="generateURLQR()">Generate QR Code</button>
+        </div>
+    </div>
+    
+    <!-- UPI Modal -->
+    <div id="upiModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="upiModal">&times;</span>
+            <h2>Generate UPI QR Code</h2>
+            <div class="modal-input-group">
+                <label for="upi-id">UPI ID</label>
+                <input type="text" id="upi-id" placeholder="example@bank">
+            </div>
+            <div class="modal-input-group">
+                <label for="display-name">Display Name</label>
+                <input type="text" id="display-name" placeholder="Your Name">
+            </div>
+            <div class="modal-input-group amount-group">
+                <div class="toggle-label-wrapper">
+                    <label>Set Amount (₹)</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="amount-toggle">
+                        <span class="toggle-slider"></span>
+                    </div>
+                </div>
+                <input type="text" id="amount" placeholder="0.00" disabled>
+            </div>
+            <button type="button" class="modal-btn upi-modal-btn" onclick="generateUPIQR()">Generate UPI QR</button>
+        </div>
+    </div>
+    
     <footer>
         <p>
             <a href="https://github.com/tashifkhan/QRCode-Generator.git" target="_blank" rel="noopener noreferrer">GitHub</a>
