@@ -28,7 +28,7 @@ def generate_upi_qr():
 
     console.print(Panel.fit("UPI QR Code Generator", border_style="blue"))
     
-    upi_id = Prompt.ask("[cyan]Enter UPI ID[/cyan]", default="tashifkhan010-2@okaxis")
+    upi_id = Prompt.ask("[cyan]Enter UPI ID[/cyan]", default="tashifkhan010@pingpay")
     display_name = Prompt.ask("[cyan]Enter display name[/cyan]", default="Tashif Ahmad Khan")
     amt = Prompt.ask("[cyan]Enter amount[/cyan]", default="0.00")
 
