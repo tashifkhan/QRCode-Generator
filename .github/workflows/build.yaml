@@ -94,6 +94,9 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     needs: build # Run after the build job
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Download all Artifacts
