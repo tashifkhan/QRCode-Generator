@@ -4,6 +4,18 @@ A versatile QR Code Generator with both GUI and CLI interfaces. Generate QR code
 
 ## Features
 
+#### Web Application
+
+For instant QR code generation without installing anything, visit:
+[qr.tashif.codes](https://qr.tashif.codes)
+
+The online version offers:
+
+- Instant QR code generation directly in your browser
+- Support for URL/text and UPI payment QR codes
+- No installation or dependencies required
+- Mobile-friendly responsive design
+
 ### GUI Application
 
 - User-friendly web interface with modal dialogs for URL/Text and UPI QR code generation.
@@ -93,18 +105,6 @@ pyinstaller --onefile cli.py
 
 The executables will be available in the `dist` directory.
 
-## Web Version
-
-For instant QR code generation without installing anything, visit:
-[qr.tashif.codes](https://qr.tashif.codes)
-
-The online version offers:
-
-- Instant QR code generation directly in your browser
-- Support for URL/text and UPI payment QR codes
-- No installation or dependencies required
-- Mobile-friendly responsive design
-
 ## Usage
 
 ### GUI Application
@@ -173,13 +173,26 @@ python main.py -upi
 - Rich, Colorama: CLI enhancements.
 - Additional dependencies are listed in requirements.txt.
 
-## Codebase Updates
+## Technologies
 
-- Added UPI payment QR code generation in both the GUI and CLI.
-- Integrated modal dialogs in the GUI for both URL/Text and UPI QR code generation.
-- Introduced a Pyodide fallback mechanism for QR code generation where the Eel backend is not available.
-- Enhanced input validation (especially for UPI details) and improved UI styling.
-- Updated the project to run on Python 3.13.
+### Eel
+
+This project uses [Eel](https://github.com/ChrisKnott/Eel), a Python library for creating simple Electron-like offline HTML/JS GUI applications. Eel hosts a local web server and allows for:
+
+- Bidirectional communication between Python backend and JavaScript frontend
+- Native GUI capabilities using web technologies
+- Easy deployment as a standalone desktop application
+
+### Pyodide
+
+[Pyodide](https://pyodide.org/) is used as a fallback mechanism when the Eel backend is not available (such as when running in browsers without the Python backend). It:
+
+- Brings the Python runtime to the browser via WebAssembly
+- Allows Python code execution directly in the browser
+- Enables generation of QR codes on the client side when accessing the web version
+- Provides seamless functionality between desktop application and web version
+
+This dual approach (Eel + Pyodide fallback) ensures that the QR code generator works both as a desktop application and as a standalone web application at [qr.tashif.codes](https://qr.tashif.codes).
 
 ## Contributing
 
