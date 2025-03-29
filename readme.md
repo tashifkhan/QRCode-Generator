@@ -10,6 +10,7 @@ A versatile QR Code Generator with both GUI and CLI interfaces. Generate QR code
 - Real-time QR code generation with fallback via Pyodide.
 - Download generated QR codes.
 - Cross-platform compatibility.
+- Also available as a web app at [qr.tashif.codes](https://qr.tashif.codes).
 
 ### CLI Application
 
@@ -19,6 +20,39 @@ A versatile QR Code Generator with both GUI and CLI interfaces. Generate QR code
 - Flexible file path specification.
 
 ## Installation
+
+### Pre-packaged Applications
+
+For convenience, pre-built executable files are available in the [Releases](https://github.com/tashifkhan/QRCode-Generator/releases) section of the GitHub repository. These executables require no installation or dependencies:
+
+1. Go to the [Releases](https://github.com/tashifkhan/QRCode-Generator/releases) page
+2. Download the appropriate version for your operating system:
+   - **Windows**: Download `QRCode-Generator-Windows.zip`
+   - **macOS**: Download `QRCode-Generator-macOS.zip`
+   - **Linux**: Download `QRCode-Generator-Linux.zip`
+3. Extract the downloaded archive
+4. Run the application:
+   - **GUI**: Run `qrcode-generator-gui` (or `qrcode-generator-gui.exe` on Windows)
+   - **CLI**: Run `qrcode-generator-cli` (or `qrcode-generator-cli.exe` on Windows) from the terminal
+
+#### Note for macOS Users
+
+macOS may apply quarantine attributes to downloaded applications. If you encounter security warnings when trying to run the application, you have two options:
+
+1. **Remove quarantine attribute using Terminal**:
+
+   ```bash
+   xattr -d com.apple.quarantine /path/to/qrcode-generator-gui
+   xattr -d com.apple.quarantine /path/to/qrcode-generator-cli
+   ```
+
+   Replace `/path/to/` with the actual path to the extracted executables.
+
+2. **Using GUI**:
+   - Right-click (or Control+click) on the application
+   - Select "Open" from the context menu
+   - When the security warning appears, click "Open"
+   - The application will be saved as an exception to your security settings
 
 ### From Source
 
@@ -59,6 +93,18 @@ pyinstaller --onefile cli.py
 
 The executables will be available in the `dist` directory.
 
+## Web Version
+
+For instant QR code generation without installing anything, visit:
+[qr.tashif.codes](https://qr.tashif.codes)
+
+The online version offers:
+
+- Instant QR code generation directly in your browser
+- Support for URL/text and UPI payment QR codes
+- No installation or dependencies required
+- Mobile-friendly responsive design
+
 ## Usage
 
 ### GUI Application
@@ -73,7 +119,7 @@ python gui.py
    - Windows: Run `gui.exe`
    - macOS/Linux: Run `./gui`
 
-Upon launching the web interface you’ll see two options:
+Upon launching the web interface you'll see two options:
 
 - **URL/Text QR**: Enter a URL or text to generate a QR code.
 - **UPI QR**: Enter your UPI ID, display name, and optionally set an amount to generate a UPI payment QR code.
@@ -83,19 +129,19 @@ Upon launching the web interface you’ll see two options:
 1. Run from source:
 
 ```bash
-python cli.py [URL] [-s SAVE_PATH] [-d]
+python main.py [URL] [-s SAVE_PATH] [-d]
 ```
 
 For UPI QR code generation, run:
 
 ```bash
-python cli.py -upi [UPI_ID] [-s SAVE_PATH]
+python main.py -upi
 ```
 
 2. Or use the packaged executable:
 
 ```bash
-./cli [URL] [-s SAVE_PATH] [-d]
+./main [URL] [-s SAVE_PATH] [-d]
 ```
 
 Options:
@@ -109,13 +155,13 @@ Examples:
 
 ```bash
 # Generate and display a URL QR code
-python cli.py https://tashif.codes -d
+python main.py https://tashif.codes -d
 
 # Generate and save a URL QR code
-python cli.py https://tashif.codes -s "/Users/taf/Desktop/My Website QR Code.png"
+python main.py https://tashif.codes -s "/Users/taf/Desktop/My Website QR Code.png"
 
 # Generate a UPI QR code interactively
-python cli.py -upi
+python main.py -upi
 ```
 
 ## Dependencies
