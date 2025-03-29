@@ -112,12 +112,12 @@ The online version offers:
 1. Run from source:
 
 ```bash
-python gui.py
+python app.py
 ```
 
 2. Or use the packaged executable:
-   - Windows: Run `gui.exe`
-   - macOS/Linux: Run `./gui`
+   - Windows: Run `app.exe`
+   - macOS/Linux: Run `./app`
 
 Upon launching the web interface you'll see two options:
 
