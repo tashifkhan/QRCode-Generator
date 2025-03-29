@@ -26,9 +26,10 @@ body {
 }
 
 .container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 2rem;
+    max-width: 1000px;
+    width: 90%;
+    margin: 3rem auto;
+    padding: 3rem;
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -46,11 +47,11 @@ body {
 
 h1 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     color: var(--heading-color);
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-size: clamp(2rem, 5vw, 2.8rem);
     border-bottom: 2px solid var(--secondary-color);
-    padding-bottom: 0.75rem;
+    padding-bottom: 1rem;
     letter-spacing: -0.5px;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -106,14 +107,16 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
-    padding: 2rem;
+    gap: 2rem;
+    padding: 3rem;
     background: rgba(17, 34, 64, 0.3);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    border-radius: 12px;
+    border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
+    max-width: 80%;
+    margin: 0 auto;
 }
 
 .qr-section:hover {
@@ -124,20 +127,19 @@ button:hover {
 #qr {
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: 12px;
     transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .download-btn {
     background: rgba(100, 255, 218, 0.2);
     color: var(--secondary-color);
     border: 1px solid var(--secondary-color);
-    margin-top: 1rem;
-}
-
-.download-btn:hover {
-    background: var(--secondary-color);
-    color: var(--background-color);
+    margin-top: 1.5rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
 }
 
 footer {
@@ -197,12 +199,12 @@ footer a:hover {
 .modal-content {
     position: relative;
     background: var(--glass-bg);
-    margin: 10% auto;
-    padding: 2rem;
+    margin: 5% auto;
+    padding: 3rem;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     width: 80%;
-    max-width: 500px;
+    max-width: 600px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
     animation: modalFadeIn 0.3s ease-out;
 }
@@ -278,34 +280,35 @@ footer a:hover {
 .modal-btn {
     display: block;
     width: 100%;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     background: var(--accent-color);
-}
-
-.modal-btn:hover {
-    box-shadow: 0 0 25px rgba(255, 100, 218, 0.4);
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
 }
 
 .button-section {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 2rem;
+    margin-bottom: 3rem;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.url-btn, .upi-btn {
+    padding: 1.2rem 2.5rem;
+    font-size: 1.2rem;
+    flex: 1;
+    max-width: 350px;
+    border-radius: 14px;
+    transition: all 0.3s ease;
 }
 
 .url-btn {
     background: var(--secondary-color);
     color: var(--background-color);
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    flex: 1;
-    max-width: 300px;
-}
-
-.url-btn:hover {
-    box-shadow: 0 0 25px rgba(100, 255, 218, 0.4);
-    transform: translateY(-2px);
 }
 
 .url-modal-btn {
@@ -465,6 +468,7 @@ input:checked + .toggle-slider:before {
     .container {
         margin: 1rem;
         padding: 1rem;
+        width: calc(100% - 2rem);
     }
 
     .input-section {
@@ -493,5 +497,50 @@ input:checked + .toggle-slider:before {
     .url-btn, .upi-btn {
         width: 100%;
         max-width: none;
+    }
+}
+
+/* Desktop specific styles */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1200px;
+        padding: 4rem;
+    }
+    
+    .button-section {
+        gap: 3rem;
+        max-width: 900px;
+    }
+    
+    .qr-section {
+        max-width: 70%;
+        padding: 4rem;
+    }
+    
+    #qr {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    
+    .modal-content {
+        max-width: 650px;
+    }
+    
+    h1 {
+        margin-bottom: 4rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .container {
+        padding: 3rem;
+    }
+    
+    .button-section {
+        gap: 2rem;
+    }
+    
+    .qr-section {
+        max-width: 75%;
     }
 }
