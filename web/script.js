@@ -4,14 +4,93 @@ function generateQRCode() {
         alert("Please enter text or URL");
         return;
     }
-    eel.generate_qr_web(data)(function(base64) {
-        console.log(base64);
-        if (base64) {
-            setImage(base64);
+    try {
+        eel.generate_qr_web(data)(function(base64) {
+            console.log(base64);
+            if (base64) {
+                setImage(base64);
+            } else {
+                alert("Failed to generate QR code");
+            }
+        });
+    } catch (error) {
+        if (error instanceof ReferenceError && error.message.includes("eel")) {
+            generateQRWithPyodide(data)
+                .then(base64 => setImage(base64))
+                .catch(err => {
+                    console.error("Error with Pyodide fallback:", err);
+                    alert("Failed to generate QR code: " + err.message);
+                });
         } else {
-            alert("Failed to generate QR code");
+            console.error("Error generating QR code:", error);
+            alert("Failed to generate QR code: " + error.message);
         }
-    });
+    }
+}
+
+// New helper function to generate QR codes using Pyodide
+async function generateQRWithPyodide(data) {
+    // Check if we need to load Pyodide
+    if (typeof pyodide === 'undefined') {
+        // Add script to load Pyodide if not already present
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
+        document.head.appendChild(script);
+        
+        // Wait for script to load
+        await new Promise((resolve, reject) => {
+            script.onload = resolve;
+            script.onerror = reject;
+        });
+    }
+    
+    try {
+        const pyodide = await loadPyodide();
+        await pyodide.loadPackage("micropip");
+        await pyodide.runPythonAsync(`
+            import micropip
+            await micropip.install("qrcode")
+            await micropip.install("pillow")
+        `);
+        
+        // Escape any quotes in the data to prevent Python syntax errors
+        const safeData = data.replace(/"/g, '\\"');
+        
+        const base64 = await pyodide.runPythonAsync(`
+            import qrcode
+            import io
+            from base64 import b64encode
+            
+            if "${safeData}" is None or "${safeData}" == "":
+                raise ValueError("Error: QR code data cannot be empty")
+            
+            img = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            img.add_data("${safeData}")
+            img.make(fit=True)
+            
+            # Create PIL image
+            pil_img = img.make_image(fill_color="black", back_color="white")
+            
+            # Save to bytes buffer
+            buffer = io.BytesIO()
+            pil_img.save(buffer, format="PNG")
+            buffer.seek(0)
+            
+            # Convert to base64
+            encoded = b64encode(buffer.getvalue()).decode("ascii")
+            "data:image/png;base64," + encoded
+        `);
+        
+        return base64;
+    } catch (pyodideError) {
+        console.error("Failed to generate QR with Pyodide:", pyodideError);
+        throw new Error("Failed to generate QR code: " + pyodideError.message);
+    }
 }
 
 function showURLModal() {
@@ -35,14 +114,31 @@ function generateURLQR() {
         return;
     }
     
-    eel.generate_qr_web(urlText)(function(base64) {
-        if (base64) {
-            setImage(base64, urlText);
-            closeModal("urlModal");
+    try {
+        eel.generate_qr_web(urlText)(function(base64) {
+            if (base64) {
+                setImage(base64, urlText);
+                closeModal("urlModal");
+            } else {
+                alert("Failed to generate QR code");
+            }
+        });
+    } catch (error) {
+        if (error instanceof ReferenceError && error.message.includes("eel")) {
+            generateQRWithPyodide(urlText)
+                .then(base64 => {
+                    setImage(base64, urlText);
+                    closeModal("urlModal");
+                })
+                .catch(err => {
+                    console.error("Error with Pyodide fallback:", err);
+                    alert("Failed to generate QR code: " + err.message);
+                });
         } else {
-            alert("Failed to generate QR code");
+            console.error("Error generating URL QR code:", error);
+            alert("Failed to generate QR code: " + error.message);
         }
-    });
+    }
 }
 
 function generateUPIQR() {
@@ -70,15 +166,36 @@ function generateUPIQR() {
         amount = amount + ".00";
     }
     
-    eel.generate_upi_qr_web(upiId, displayName, amount)(function(base64) {
-        if (base64) {
-            let filename = `upi-${upiId.replace('@', '-')}`;
-            setImage(base64, filename);
-            closeModal("upiModal");
+    try {
+        eel.generate_upi_qr_web(upiId, displayName, amount)(function(base64) {
+            if (base64) {
+                let filename = `upi-${upiId.replace('@', '-')}`;
+                setImage(base64, filename);
+                closeModal("upiModal");
+            } else {
+                alert("Failed to generate UPI QR code");
+            }
+        });
+    } catch (error) {
+        if (error instanceof ReferenceError && error.message.includes("eel")) {
+            // Generate UPI QR code with Pyodide
+            const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(displayName)}${amount ? '&am=' + encodeURIComponent(amount) : ''}`;
+            
+            generateQRWithPyodide(upiString)
+                .then(base64 => {
+                    let filename = `upi-${upiId.replace('@', '-')}`;
+                    setImage(base64, filename);
+                    closeModal("upiModal");
+                })
+                .catch(err => {
+                    console.error("Error with Pyodide fallback:", err);
+                    alert("Failed to generate UPI QR code: " + err.message);
+                });
         } else {
-            alert("Failed to generate UPI QR code");
+            console.error("Error generating UPI QR code:", error);
+            alert("Failed to generate UPI QR code: " + error.message);
         }
-    });
+    }
 }
 
 function setImage(base64, filename = "qr-code") {
