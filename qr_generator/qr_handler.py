@@ -7,6 +7,7 @@ from PIL import Image
 def generate_qr(data, display=False, save_path=None):
     img = pyqrcode.create(data)
     buffers = io.BytesIO()
+
     img.png(buffers, scale=8)
     
     if display:
@@ -29,5 +30,19 @@ def generate_qr(data, display=False, save_path=None):
     print("QR code generation successful.")
     return "data:image/png;base64, " + encoded
 
-if __name__ == "__main__":
-    generate_qr("portfolio.tashif.codes", display=True)
+def generate_upi_qr():
+    upi_id = input("Enter UPI ID: ")
+    display_name = input("Enter display name: ")
+    amt = input("Enter amount: ")
+
+    if not amt:
+        amt = "0.00"
+    elif "." not in amt:
+        amt = amt + ".00"
+
+    if not upi_id:
+        upi_id = "tashifkhan010-2@okaxis"
+    if not display_name:
+        display_name = "Tashif Ahmad Khan"
+    upi_data = f"upi://pay?pa={upi_id}&pn={display_name}&am={amt}&cu=INR"
+    return generate_qr(upi_data, display=True)
