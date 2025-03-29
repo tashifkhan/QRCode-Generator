@@ -5,6 +5,19 @@ from base64 import b64encode
 from PIL import Image
 
 def generate_qr(data, display=False, save_path=None):
+
+    if data is None:
+        raise ValueError("Error: QR code data cannot be None")
+    
+    if not isinstance(data, str):
+        try:
+            data = str(data)
+        except:
+            raise ValueError("Error: QR code data must be convertible to string")
+    
+    if data == "":
+        raise ValueError("Error: QR code data cannot be empty")
+    
     img = pyqrcode.create(data)
     buffers = io.BytesIO()
 
