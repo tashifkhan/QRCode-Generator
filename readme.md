@@ -4,7 +4,7 @@ A versatile QR Code Generator with both GUI and CLI interfaces. Generate QR code
 
 ## Features
 
-#### Web Application
+### Web Application
 
 For instant QR code generation without installing anything, visit:
 [qr.tashif.codes](https://qr.tashif.codes)
