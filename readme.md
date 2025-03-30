@@ -94,13 +94,13 @@ pip install pyinstaller
 2. Build GUI Application:
 
 ```bash
-pyinstaller --onefile --windowed --add-data "web:web" gui.py
+pyinstaller --onefile --windowed --add-data "web:web" app.py
 ```
 
 3. Build CLI Application:
 
 ```bash
-pyinstaller --onefile cli.py
+pyinstaller --onefile main.py
 ```
 
 The executables will be available in the `dist` directory.
