@@ -179,7 +179,6 @@ footer a:hover {
 .upi-btn:hover {
     box-shadow: 0 0 25px rgba(100, 255, 218, 0.4);
     background: rgba(100, 255, 218, 0.1);
-    transform: translateY(-2px);
 }
 
 /* Modal styles */
@@ -498,51 +497,62 @@ input:checked + .toggle-slider:before {
     }
 }
 
-/* PWA install prompt - Bottom positioned like offline indicator */
+/* PWA install prompt - Bottom positioned and center-aligned */
 .install-btn {
     position: fixed !important;
     bottom: 20px !important;
-    right: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(100, 255, 218, 0.1) 100%) !important;
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px) !important;
     color: var(--secondary-color) !important;
     border: 1px solid rgba(100, 255, 218, 0.4) !important;
-    padding: 14px 20px !important;
-    border-radius: 20px !important;
+    padding: 10px 16px !important;
+    border-radius: 16px !important;
     cursor: pointer !important;
     z-index: 1000 !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
-    letter-spacing: 0.5px !important;
+    letter-spacing: 0.3px !important;
     box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        0 0 20px rgba(100, 255, 218, 0.2) !important;
+        0 6px 24px rgba(0, 0, 0, 0.25),
+        0 0 15px rgba(100, 255, 218, 0.15) !important;
     transition: all 0.3s ease !important;
     font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace !important;
-    min-width: 130px !important;
+    min-width: 100px !important;
     text-align: center !important;
     animation: slideInFromBottom 0.4s ease-out !important;
 }
 
 .install-btn:hover {
-    transform: translateY(-3px) scale(1.02) !important;
+    transform: translateX(-50%) translateY(-2px) scale(1.02) !important;
     box-shadow: 
-        0 12px 40px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(100, 255, 218, 0.4) !important;
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        0 0 25px rgba(100, 255, 218, 0.3) !important;
     border-color: var(--secondary-color) !important;
     background: linear-gradient(135deg, rgba(100, 255, 218, 0.15) 0%, rgba(100, 255, 218, 0.25) 100%) !important;
 }
 
 .install-btn:active {
-    transform: translateY(-1px) scale(0.98) !important;
+    transform: translateX(-50%) translateY(-1px) scale(0.98) !important;
+}
+
+/* Mobile hover effects for center-aligned install button */
+.install-btn:hover {
+    transform: translateX(-50%) translateY(-1px) scale(1.01) !important;
+}
+
+.install-btn:active {
+    transform: translateX(-50%) translateY(0) scale(0.99) !important;
 }
 
 /* Position install button above offline indicator when both are present */
 .offline-indicator + .install-btn,
 body.offline .install-btn {
     bottom: 85px !important;
-    transition: bottom 0.3s ease-out !important;
+    transform: translateX(-50%) !important;
+    transition: bottom 0.3s ease-out, transform 0.3s ease !important;
 }
 
 /* Update notification - Glassmorphism style with content push */
@@ -792,20 +802,22 @@ body.has-update-notification .container {
         padding-top: 70px;
     }
     
-    /* Adjust install button for mobile - bottom positioned */
+    /* Adjust install button for mobile - center-aligned and smaller */
     .install-btn {
         bottom: 15px !important;
-        right: 15px !important;
-        padding: 12px 16px !important;
-        font-size: 13px !important;
-        border-radius: 16px !important;
-        min-width: 110px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+        border-radius: 12px !important;
+        min-width: 80px !important;
     }
     
     /* Position install button above offline indicator on mobile when both present */
     .offline-indicator + .install-btn,
     body.offline .install-btn {
         bottom: 75px !important;
+        transform: translateX(-50%) !important;
     }
     
     /* Update notification mobile adjustments */
@@ -932,7 +944,7 @@ body.has-update-notification .container {
 
 .brief-toast {
     position: fixed;
-    bottom: 20px;
+    bottom: 65px;
     left: 50%;
     transform: translateX(-50%);
     background: var(--glass-bg);
