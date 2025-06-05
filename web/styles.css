@@ -466,10 +466,30 @@ input:checked + .toggle-slider:before {
 
 /* PWA Specific Styles */
 
-/* Install button animation */
+/* Install button animation - from bottom with bounce effect */
+@keyframes slideInFromBottom {
+    0% {
+        transform: translateY(120%);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-5px);
+        opacity: 0.8;
+    }
+    80% {
+        transform: translateY(2px);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Legacy slideIn animation for offline indicator */
 @keyframes slideIn {
     from {
-        transform: translateX(100%);
+        transform: translateX(-20px);
         opacity: 0;
     }
     to {
@@ -478,40 +498,51 @@ input:checked + .toggle-slider:before {
     }
 }
 
-/* PWA install prompt - Glassmorphism style with better alignment */
+/* PWA install prompt - Bottom positioned like offline indicator */
 .install-btn {
     position: fixed !important;
-    top: 2px !important;
-    right: 2px !important;
-    background: var(--glass-bg) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(100, 255, 218, 0.1) 100%) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
     color: var(--secondary-color) !important;
-    border: 1px solid rgba(100, 255, 218, 0.3) !important;
-    padding: 12px 18px !important;
-    border-radius: 16px !important;
+    border: 1px solid rgba(100, 255, 218, 0.4) !important;
+    padding: 14px 20px !important;
+    border-radius: 20px !important;
     cursor: pointer !important;
-    z-index: 1002 !important;
+    z-index: 1000 !important;
     font-size: 14px !important;
     font-weight: 600 !important;
     letter-spacing: 0.5px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(100, 255, 218, 0.2) !important;
     transition: all 0.3s ease !important;
     font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace !important;
-    min-width: 100px !important;
+    min-width: 130px !important;
     text-align: center !important;
+    animation: slideInFromBottom 0.4s ease-out !important;
 }
 
 .install-btn:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 0 25px rgba(100, 255, 218, 0.4) !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(100, 255, 218, 0.4) !important;
     border-color: var(--secondary-color) !important;
+    background: linear-gradient(135deg, rgba(100, 255, 218, 0.15) 0%, rgba(100, 255, 218, 0.25) 100%) !important;
 }
 
-/* Adjust install button when update notification is present */
-body.has-update-notification .install-btn {
-    top: 104px !important;
-    transition: top 0.3s ease-out !important;
+.install-btn:active {
+    transform: translateY(-1px) scale(0.98) !important;
+}
+
+/* Position install button above offline indicator when both are present */
+.offline-indicator + .install-btn,
+body.offline .install-btn {
+    bottom: 85px !important;
+    transition: bottom 0.3s ease-out !important;
 }
 
 /* Update notification - Glassmorphism style with content push */
@@ -761,19 +792,20 @@ body.has-update-notification .container {
         padding-top: 70px;
     }
     
-    /* Adjust install button for mobile */
+    /* Adjust install button for mobile - bottom positioned */
     .install-btn {
-        top: 16px !important;
-        right: 16px !important;
-        padding: 10px 14px !important;
+        bottom: 15px !important;
+        right: 15px !important;
+        padding: 12px 16px !important;
         font-size: 13px !important;
-        border-radius: 12px !important;
-        min-width: 100px !important;
+        border-radius: 16px !important;
+        min-width: 110px !important;
     }
     
-    /* Adjust install button when update notification is present on mobile */
-    body.has-update-notification .install-btn {
-        top: 86px !important;
+    /* Position install button above offline indicator on mobile when both present */
+    .offline-indicator + .install-btn,
+    body.offline .install-btn {
+        bottom: 75px !important;
     }
     
     /* Update notification mobile adjustments */
@@ -1238,6 +1270,26 @@ body.has-update-notification .container {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Smooth transitions for bottom element stacking */
+.install-btn,
+.offline-indicator,
+.brief-toast {
+    transition: bottom 0.3s ease-out, transform 0.3s ease !important;
+}
+
+/* Ensure proper z-index stacking for bottom elements */
+.offline-indicator {
+    z-index: 999;
+}
+
+.install-btn {
+    z-index: 1000;
+}
+
+.brief-toast {
+    z-index: 10000;
 }
 
 /* Custom scrollbar for history dropdown */

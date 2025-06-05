@@ -137,9 +137,12 @@ function initializePWAInstall() {
 
 // Show install prompt
 function showInstallPrompt() {
+    // Remove any existing install button
+    hideInstallPrompt();
+    
     const installButton = document.createElement('button');
     installButton.className = 'install-btn';
-    installButton.innerHTML = '📱 Install App';
+    installButton.innerHTML = '⬇️ Install App';
     
     installButton.addEventListener('click', async () => {
         if (deferredPrompt) {
@@ -157,6 +160,23 @@ function showInstallPrompt() {
     });
     
     document.body.appendChild(installButton);
+    
+    // Adjust positioning if offline indicator is present
+    updateInstallButtonPosition();
+}
+
+// Update install button position based on other bottom elements
+function updateInstallButtonPosition() {
+    const installButton = document.querySelector('.install-btn');
+    const offlineIndicator = document.querySelector('.offline-indicator');
+    
+    if (installButton && offlineIndicator) {
+        // Both elements present - stack install button above offline indicator
+        document.body.classList.add('offline');
+    } else if (installButton) {
+        // Only install button present
+        document.body.classList.remove('offline');
+    }
 }
 
 // Hide install prompt
@@ -164,6 +184,10 @@ function hideInstallPrompt() {
     const installButton = document.querySelector('.install-btn');
     if (installButton) {
         installButton.remove();
+        
+        // Clean up positioning classes
+        document.body.classList.remove('offline');
+        updateInstallButtonPosition();
     }
 }
 
@@ -521,6 +545,9 @@ function initializeNetworkHandling() {
             offlineDiv.className = 'offline-indicator';
             offlineDiv.innerHTML = '🔌 Offline Mode - Using cached resources';
             document.body.appendChild(offlineDiv);
+            
+            // Update install button position
+            updateInstallButtonPosition();
         }
     }
     
@@ -529,6 +556,9 @@ function initializeNetworkHandling() {
         const offlineDiv = document.querySelector('.offline-indicator');
         if (offlineDiv) {
             offlineDiv.remove();
+            
+            // Update install button position
+            updateInstallButtonPosition();
         }
     }
     
