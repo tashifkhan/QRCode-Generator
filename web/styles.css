@@ -481,8 +481,8 @@ input:checked + .toggle-slider:before {
 /* PWA install prompt - Glassmorphism style with better alignment */
 .install-btn {
     position: fixed !important;
-    top: 36px !important;
-    right: 24px !important;
+    top: 2px !important;
+    right: 2px !important;
     background: var(--glass-bg) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
@@ -498,7 +498,7 @@ input:checked + .toggle-slider:before {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     transition: all 0.3s ease !important;
     font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace !important;
-    min-width: 120px !important;
+    min-width: 100px !important;
     text-align: center !important;
 }
 
