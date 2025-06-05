@@ -571,6 +571,30 @@ function showUserFriendlyError(message, isNetworkError = false) {
     }, 5000);
 }
 
+// Show brief toast notification (mobile-friendly feedback)
+function showBriefToast(message, duration = 2000) {
+    // Remove any existing toast
+    const existingToast = document.querySelector('.brief-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = 'brief-toast';
+    toast.textContent = message;
+    
+    // Add to page
+    document.body.appendChild(toast);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, duration);
+}
+
 // Add UPI ID to history
 function addToUPIHistory(upiId, displayName) {
     if (!upiId || !upiId.trim()) return;
@@ -608,11 +632,27 @@ function clearUPIHistory() {
 }
 
 // Remove specific item from history
-function removeFromUPIHistory(upiId) {
+function removeFromUPIHistory(upiId, displayName = '') {
+    // Check if device is mobile/touch
+    const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+    
+    if (isMobile) {
+        // Show mobile-friendly confirmation
+        const confirmMessage = `Remove "${upiId}"${displayName ? ` (${displayName})` : ''} from history?`;
+        if (!confirm(confirmMessage)) {
+            return;
+        }
+    }
+    
     let history = loadUPIHistory();
     history = history.filter(item => item.upiId !== upiId);
     saveUPIHistory(history);
     updateUPIHistoryDropdown();
+    
+    // Show brief success feedback on mobile
+    if (isMobile) {
+        showBriefToast('Removed from history');
+    }
 }
 
 // Update the dropdown display
@@ -635,8 +675,10 @@ function updateUPIHistoryDropdown() {
                 <div class="history-item-id">${item.upiId}</div>
                 ${item.displayName ? `<div class="history-item-name" style="font-size: 0.8rem; opacity: 0.8;">${item.displayName}</div>` : ''}
             </div>
-            <div class="history-item-date">${item.date}</div>
-            <button class="history-item-remove" onclick="event.stopPropagation(); removeFromUPIHistory('${item.upiId}')" title="Remove">×</button>
+            <div class="history-item-meta">
+                <div class="history-item-date">${item.date}</div>
+                <button class="history-item-remove" onclick="event.stopPropagation(); removeFromUPIHistory('${item.upiId}', '${item.displayName || ''}')" title="Remove from history" aria-label="Remove ${item.upiId} from history">×</button>
+            </div>
         </div>
     `).join('');
 }
@@ -736,8 +778,10 @@ function displayFilteredHistory(filteredHistory) {
                 <div class="history-item-id">${item.upiId}</div>
                 ${item.displayName ? `<div class="history-item-name" style="font-size: 0.8rem; opacity: 0.8;">${item.displayName}</div>` : ''}
             </div>
-            <div class="history-item-date">${item.date}</div>
-            <button class="history-item-remove" onclick="event.stopPropagation(); removeFromUPIHistory('${item.upiId}')" title="Remove">×</button>
+            <div class="history-item-meta">
+                <div class="history-item-date">${item.date}</div>
+                <button class="history-item-remove" onclick="event.stopPropagation(); removeFromUPIHistory('${item.upiId}', '${item.displayName || ''}')" title="Remove from history" aria-label="Remove ${item.upiId} from history">×</button>
+            </div>
         </div>
     `).join('');
 }

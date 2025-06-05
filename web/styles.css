@@ -481,7 +481,7 @@ input:checked + .toggle-slider:before {
 /* PWA install prompt - Glassmorphism style with better alignment */
 .install-btn {
     position: fixed !important;
-    top: 24px !important;
+    top: 36px !important;
     right: 24px !important;
     background: var(--glass-bg) !important;
     backdrop-filter: blur(10px) !important;
@@ -840,7 +840,90 @@ body.has-update-notification .container {
     }
     
     .history-item-remove {
-        font-size: 11px;
+        font-size: 14px;
+        padding: 3px 5px !important;
+        opacity: 1 !important;
+        min-width: 10px;
+        min-height: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background: rgba(255, 107, 107, 0.1);
+    }
+    
+    .history-item {
+        position: relative;
+        touch-action: pan-y; 
+        padding: 12px 16px; 
+    }
+    
+    .history-item-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0; 
+    }
+    
+    .history-item-meta {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+    
+    .history-item-date {
+        font-size: 0.7rem;
+        text-align: right;
+    }
+    
+    .history-item-remove {
+        font-size: 16px !important;
+        padding: 5px 6px !important;
+        opacity: 1 !important; 
+        min-width: 12px !important;
+        min-height: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        background: rgba(255, 107, 107, 0.15) !important;
+        border: 1px solid rgba(255, 107, 107, 0.3) !important;
+    }
+    
+    /* Better visual feedback for touch */
+    .history-item-remove:active {
+        background: rgba(255, 107, 107, 0.3) !important;
+        transform: scale(0.9) !important;
+    }
+}
+
+
+.brief-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: var(--text-color);
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+    z-index: 10000;
+    animation: toastSlideIn 0.3s ease-out;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
     }
 }
 
@@ -1078,17 +1161,31 @@ body.has-update-notification .container {
     color: var(--secondary-color);
 }
 
-.history-item-id {
+.history-item-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.history-item-id {
     color: var(--text-color);
     font-size: 0.9rem;
+    word-break: break-all;
+}
+
+.history-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .history-item-date {
     color: var(--text-color);
     font-size: 0.75rem;
     opacity: 0.7;
-    margin-left: 10px;
+    white-space: nowrap;
 }
 
 .history-item-remove {
@@ -1096,20 +1193,32 @@ body.has-update-notification .container {
     border: none;
     color: #ff6b6b;
     cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 14px;
     margin-left: 8px;
     transition: all 0.3s ease;
     opacity: 0;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
+/* Show remove button on hover for desktop */
 .history-item:hover .history-item-remove {
     opacity: 1;
 }
 
 .history-item-remove:hover {
-    background: rgba(255, 107, 107, 0.1);
+    background: rgba(255, 107, 107, 0.2);
+    transform: scale(1.1);
+}
+
+.history-item-remove:active {
+    transform: scale(0.95);
 }
 
 .no-history {
