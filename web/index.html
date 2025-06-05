@@ -75,6 +75,15 @@
             <div class="modal-input-group">
                 <label for="upi-id">UPI ID</label>
                 <input type="text" id="upi-id" placeholder="example@bank">
+                <div class="upi-history-dropdown" id="upi-history-dropdown" style="display: none;">
+                    <div class="history-header">
+                        <span>Recent UPI IDs</span>
+                        <button type="button" class="clear-history-btn" onclick="clearUPIHistory()" title="Clear History">🗑️</button>
+                    </div>
+                    <div class="history-list" id="upi-history-list">
+                        <!-- History items will be populated here -->
+                    </div>
+                </div>
             </div>
             <div class="modal-input-group">
                 <label for="display-name">Display Name</label>

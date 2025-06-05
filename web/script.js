@@ -1,3 +1,27 @@
+// UPI History Configuration
+const UPI_HISTORY_KEY = 'qr-generator-upi-history';
+const MAX_HISTORY_ITEMS = 10;
+
+// Load UPI history from localStorage
+function loadUPIHistory() {
+    try {
+        const history = localStorage.getItem(UPI_HISTORY_KEY);
+        return history ? JSON.parse(history) : [];
+    } catch (error) {
+        console.warn('Failed to load UPI history:', error);
+        return [];
+    }
+}
+
+// Save UPI history to localStorage
+function saveUPIHistory(history) {
+    try {
+        localStorage.setItem(UPI_HISTORY_KEY, JSON.stringify(history));
+    } catch (error) {
+        console.warn('Failed to save UPI history:', error);
+    }
+}
+
 function generateQRCode() {
     let data = document.getElementById("data").value;
     if (!data) {
@@ -408,6 +432,9 @@ function generateUPIQR() {
                 hideLoader("upi-loader");
                 
                 if (base64) {
+                    // Add to history on successful generation
+                    addToUPIHistory(upiId, displayName);
+                    
                     let filename = `upi-${upiId.replace('@', '-')}`;
                     setImage(base64, filename);
                     closeModal("upiModal");
@@ -429,6 +456,10 @@ function generateUPIQR() {
             .then(base64 => {
                 // Hide loader
                 hideLoader("upi-loader");
+                
+                // Add to history on successful generation
+                addToUPIHistory(upiId, displayName);
+                
                 let filename = `upi-${upiId.replace('@', '-')}`;
                 setImage(base64, filename);
                 closeModal("upiModal");
@@ -540,6 +571,231 @@ function showUserFriendlyError(message, isNetworkError = false) {
     }, 5000);
 }
 
+// Add UPI ID to history
+function addToUPIHistory(upiId, displayName) {
+    if (!upiId || !upiId.trim()) return;
+    
+    let history = loadUPIHistory();
+    
+    // Remove existing entry if it exists
+    history = history.filter(item => item.upiId !== upiId.trim());
+    
+    // Add new entry at the beginning
+    history.unshift({
+        upiId: upiId.trim(),
+        displayName: displayName ? displayName.trim() : '',
+        timestamp: Date.now(),
+        date: new Date().toLocaleDateString()
+    });
+    
+    // Keep only the latest MAX_HISTORY_ITEMS
+    if (history.length > MAX_HISTORY_ITEMS) {
+        history = history.slice(0, MAX_HISTORY_ITEMS);
+    }
+    
+    saveUPIHistory(history);
+}
+
+// Clear UPI history
+function clearUPIHistory() {
+    try {
+        localStorage.removeItem(UPI_HISTORY_KEY);
+        updateUPIHistoryDropdown();
+        console.log('UPI history cleared');
+    } catch (error) {
+        console.warn('Failed to clear UPI history:', error);
+    }
+}
+
+// Remove specific item from history
+function removeFromUPIHistory(upiId) {
+    let history = loadUPIHistory();
+    history = history.filter(item => item.upiId !== upiId);
+    saveUPIHistory(history);
+    updateUPIHistoryDropdown();
+}
+
+// Update the dropdown display
+function updateUPIHistoryDropdown() {
+    const historyList = document.getElementById('upi-history-list');
+    const dropdown = document.getElementById('upi-history-dropdown');
+    
+    if (!historyList || !dropdown) return;
+    
+    const history = loadUPIHistory();
+    
+    if (history.length === 0) {
+        historyList.innerHTML = '<div class="no-history">No recent UPI IDs</div>';
+        return;
+    }
+    
+    historyList.innerHTML = history.map(item => `
+        <div class="history-item" onclick="selectUPIFromHistory('${item.upiId}', '${item.displayName}')">
+            <div class="history-item-content">
+                <div class="history-item-id">${item.upiId}</div>
+                ${item.displayName ? `<div class="history-item-name" style="font-size: 0.8rem; opacity: 0.8;">${item.displayName}</div>` : ''}
+            </div>
+            <div class="history-item-date">${item.date}</div>
+            <button class="history-item-remove" onclick="event.stopPropagation(); removeFromUPIHistory('${item.upiId}')" title="Remove">×</button>
+        </div>
+    `).join('');
+}
+
+// Select UPI ID from history
+function selectUPIFromHistory(upiId, displayName) {
+    const upiInput = document.getElementById('upi-id');
+    const nameInput = document.getElementById('display-name');
+    const dropdown = document.getElementById('upi-history-dropdown');
+    
+    if (upiInput) {
+        upiInput.value = upiId;
+        upiInput.focus();
+    }
+    
+    if (nameInput && displayName) {
+        nameInput.value = displayName;
+    }
+    
+    // Hide dropdown
+    if (dropdown) {
+        dropdown.style.display = 'none';
+    }
+}
+
+// Show/hide history dropdown
+function toggleUPIHistoryDropdown(show) {
+    const dropdown = document.getElementById('upi-history-dropdown');
+    if (!dropdown) return;
+    
+    if (show) {
+        updateUPIHistoryDropdown();
+        dropdown.style.display = 'block';
+    } else {
+        dropdown.style.display = 'none';
+    }
+}
+
+// Initialize UPI history functionality
+function initializeUPIHistory() {
+    const upiInput = document.getElementById('upi-id');
+    const dropdown = document.getElementById('upi-history-dropdown');
+    
+    if (!upiInput || !dropdown) return;
+    
+    // Show dropdown on focus if there's history
+    upiInput.addEventListener('focus', () => {
+        const history = loadUPIHistory();
+        if (history.length > 0) {
+            toggleUPIHistoryDropdown(true);
+        }
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (event) => {
+        if (!upiInput.contains(event.target) && !dropdown.contains(event.target)) {
+            toggleUPIHistoryDropdown(false);
+        }
+    });
+    
+    // Filter history as user types
+    upiInput.addEventListener('input', () => {
+        const query = upiInput.value.toLowerCase();
+        const history = loadUPIHistory();
+        
+        if (query.length > 0 && history.length > 0) {
+            const filteredHistory = history.filter(item => 
+                item.upiId.toLowerCase().includes(query) ||
+                (item.displayName && item.displayName.toLowerCase().includes(query))
+            );
+            
+            if (filteredHistory.length > 0) {
+                displayFilteredHistory(filteredHistory);
+                toggleUPIHistoryDropdown(true);
+            } else {
+                toggleUPIHistoryDropdown(false);
+            }
+        } else if (query.length === 0 && history.length > 0) {
+            toggleUPIHistoryDropdown(true);
+        } else {
+            toggleUPIHistoryDropdown(false);
+        }
+    });
+    
+    // Add keyboard navigation
+    upiInput.addEventListener('keydown', handleUPIHistoryKeyboard);
+}
+
+// Display filtered history
+function displayFilteredHistory(filteredHistory) {
+    const historyList = document.getElementById('upi-history-list');
+    if (!historyList) return;
+    
+    historyList.innerHTML = filteredHistory.map(item => `
+        <div class="history-item" onclick="selectUPIFromHistory('${item.upiId}', '${item.displayName}')">
+            <div class="history-item-content">
+                <div class="history-item-id">${item.upiId}</div>
+                ${item.displayName ? `<div class="history-item-name" style="font-size: 0.8rem; opacity: 0.8;">${item.displayName}</div>` : ''}
+            </div>
+            <div class="history-item-date">${item.date}</div>
+            <button class="history-item-remove" onclick="event.stopPropagation(); removeFromUPIHistory('${item.upiId}')" title="Remove">×</button>
+        </div>
+    `).join('');
+}
+
+// Handle keyboard navigation in UPI history
+function handleUPIHistoryKeyboard(event) {
+    const dropdown = document.getElementById('upi-history-dropdown');
+    const historyItems = dropdown.querySelectorAll('.history-item');
+    
+    if (!dropdown || dropdown.style.display === 'none' || historyItems.length === 0) {
+        return;
+    }
+    
+    let currentIndex = -1;
+    const activeItem = dropdown.querySelector('.history-item.active');
+    if (activeItem) {
+        currentIndex = Array.from(historyItems).indexOf(activeItem);
+    }
+    
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, historyItems.length - 1);
+            highlightHistoryItem(historyItems, currentIndex);
+            break;
+            
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            highlightHistoryItem(historyItems, currentIndex);
+            break;
+            
+        case 'Enter':
+            event.preventDefault();
+            if (currentIndex >= 0 && historyItems[currentIndex]) {
+                historyItems[currentIndex].click();
+            }
+            break;
+            
+        case 'Escape':
+            event.preventDefault();
+            toggleUPIHistoryDropdown(false);
+            break;
+    }
+}
+
+// Highlight history item for keyboard navigation
+function highlightHistoryItem(items, index) {
+    // Remove active class from all items
+    items.forEach(item => item.classList.remove('active'));
+    
+    // Add active class to current item
+    if (index >= 0 && items[index]) {
+        items[index].classList.add('active');
+        items[index].scrollIntoView({ block: 'nearest' });
+    }
+}
+
 window.onload = function() {
     document.getElementById("qr").style.display = "none";
     document.getElementById("download-btn").style.display = "none";
@@ -549,6 +805,9 @@ window.onload = function() {
     registerServiceWorker();
     initializePWAInstall();
     initializeNetworkHandling();
+    
+    // Initialize UPI history
+    initializeUPIHistory();
     
     // Check eel availability on page load (useEffect-like behavior)
     isEelAvailable = checkEelAvailability();
@@ -645,4 +904,7 @@ window.onload = function() {
             });
         }
     });
+    
+    // Initialize UPI history
+    initializeUPIHistory();
 };
