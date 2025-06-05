@@ -464,6 +464,182 @@ input:checked + .toggle-slider:before {
     margin: 3rem auto;
 }
 
+/* PWA Specific Styles */
+
+/* Install button animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* PWA install prompt */
+.install-btn {
+    transition: all 0.3s ease;
+}
+
+.install-btn:hover {
+    background: #45a049 !important;
+    transform: scale(1.05);
+}
+
+/* Update notification */
+.update-notification {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Offline indicator */
+.offline-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: #ff9800;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 14px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+/* PWA splash screen style adjustments */
+@media (display-mode: standalone) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .container {
+        margin-top: 1rem;
+    }
+    
+    /* Hide install button when in standalone mode */
+    .install-btn {
+        display: none !important;
+    }
+}
+
+/* iOS PWA specific styles */
+@supports (-webkit-touch-callout: none) {
+    @media (display-mode: standalone) {
+        .container {
+            margin-top: 2rem;
+        }
+    }
+}
+
+/* Loading states for PWA */
+.loading-pyodide {
+    position: relative;
+}
+
+.loading-pyodide::after {
+    content: '⚡ Loading offline mode...';
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--secondary-color);
+    color: var(--background-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    z-index: 1000;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Enhanced mobile PWA experience */
+@media (max-width: 768px) {
+    /* Improve touch targets */
+    .url-btn, .upi-btn, .modal-btn {
+        min-height: 48px;
+        touch-action: manipulation;
+    }
+    
+    /* Better spacing for mobile PWA */
+    .container {
+        margin: 1rem auto;
+        width: 95%;
+        padding: 2rem 1.5rem;
+    }
+    
+    /* Adjust install button for mobile */
+    .install-btn {
+        top: 10px !important;
+        right: 10px !important;
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+    
+    /* Update notification mobile adjustments */
+    .update-notification div {
+        padding: 12px !important;
+        font-size: 14px;
+    }
+    
+    .update-notification button {
+        padding: 4px 8px !important;
+        font-size: 12px !important;
+        margin-left: 5px !important;
+    }
+}
+
+/* Dark theme adjustments for PWA */
+@media (prefers-color-scheme: dark) {
+    .install-btn {
+        background: var(--secondary-color) !important;
+        color: var(--background-color) !important;
+    }
+    
+    .offline-indicator {
+        background: #f44336;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .install-btn {
+        border: 2px solid white !important;
+    }
+    
+    .update-notification div {
+        border: 2px solid white;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .install-btn,
+    .update-notification,
+    .offline-indicator {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .container:hover {
+        transform: none !important;
+    }
+}
+
 @media (max-width: 600px) {
     .container {
         margin: 1rem;

@@ -26,7 +26,7 @@ function generateQRCode() {
             // Hide loader
             hideLoader("main-loader");
             console.error("Error generating QR code with eel:", error);
-            alert("Failed to generate QR code: " + error.message);
+            showUserFriendlyError("Failed to generate QR code: " + error.message);
         }
     } else {
         // Use Pyodide fallback
@@ -40,7 +40,8 @@ function generateQRCode() {
                 // Hide loader
                 hideLoader("main-loader");
                 console.error("Error with Pyodide fallback:", err);
-                alert("Failed to generate QR code: " + err.message);
+                const isOffline = !navigator.onLine;
+                showUserFriendlyError("Failed to generate QR code: " + err.message, isOffline);
             });
     }
 }
@@ -49,6 +50,7 @@ function generateQRCode() {
 let pyodideReadyPromise = null;
 let isPyodideLoading = false;
 let isEelAvailable = false;
+let deferredPrompt; // For PWA install prompt
 
 // Function to check if eel is available
 function checkEelAvailability() {
@@ -66,7 +68,135 @@ function checkEelAvailability() {
     return false;
 }
 
-// Function to preload Pyodide and required packages
+// Service Worker Registration
+async function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('Service Worker registered successfully:', registration);
+            
+            // Handle service worker updates
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // New content is available, prompt user to refresh
+                        showUpdateAvailable();
+                    }
+                });
+            });
+            
+            return registration;
+        } catch (error) {
+            console.error('Service Worker registration failed:', error);
+        }
+    }
+}
+
+// PWA Install Prompt
+function initializePWAInstall() {
+    // Listen for beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('PWA install prompt available');
+        e.preventDefault();
+        deferredPrompt = e;
+        showInstallPrompt();
+    });
+    
+    // Listen for app installed event
+    window.addEventListener('appinstalled', () => {
+        console.log('PWA installed successfully');
+        hideInstallPrompt();
+        deferredPrompt = null;
+    });
+}
+
+// Show install prompt
+function showInstallPrompt() {
+    const installButton = document.createElement('button');
+    installButton.className = 'install-btn';
+    installButton.innerHTML = '📱 Install App';
+    installButton.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 25px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    installButton.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const result = await deferredPrompt.userChoice;
+            console.log('PWA install result:', result);
+            
+            if (result.outcome === 'accepted') {
+                console.log('User accepted PWA install');
+            }
+            
+            deferredPrompt = null;
+            hideInstallPrompt();
+        }
+    });
+    
+    document.body.appendChild(installButton);
+}
+
+// Hide install prompt
+function hideInstallPrompt() {
+    const installButton = document.querySelector('.install-btn');
+    if (installButton) {
+        installButton.remove();
+    }
+}
+
+// Show update available notification
+function showUpdateAvailable() {
+    const updateNotification = document.createElement('div');
+    updateNotification.className = 'update-notification';
+    updateNotification.innerHTML = `
+        <div style="background: #2196F3; color: white; padding: 15px; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; text-align: center;">
+            <span>New version available!</span>
+            <button onclick="refreshApp()" style="background: white; color: #2196F3; border: none; padding: 5px 10px; margin-left: 10px; border-radius: 3px; cursor: pointer;">
+                Update
+            </button>
+            <button onclick="dismissUpdate()" style="background: transparent; color: white; border: 1px solid white; padding: 5px 10px; margin-left: 5px; border-radius: 3px; cursor: pointer;">
+                Later
+            </button>
+        </div>
+    `;
+    document.body.appendChild(updateNotification);
+}
+
+// Refresh app to get updates
+function refreshApp() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(registration => {
+            if (registration && registration.waiting) {
+                registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+            }
+        });
+    }
+}
+
+// Dismiss update notification
+function dismissUpdate() {
+    const updateNotification = document.querySelector('.update-notification');
+    if (updateNotification) {
+        updateNotification.remove();
+    }
+}
+
+// Enhanced Pyodide preloading with service worker support
 async function preloadPyodide() {
     if (pyodideReadyPromise) return pyodideReadyPromise;
     
@@ -77,10 +207,15 @@ async function preloadPyodide() {
     pyodideReadyPromise = (async () => {
         try {
             console.log("Preloading Pyodide...");
+            
+            // Check if we're in a service worker environment
+            const isOffline = !navigator.onLine;
+            console.log("Network status:", isOffline ? "offline" : "online");
+            
             // Add script to load Pyodide if not already present
             if (!document.querySelector('script[src*="pyodide.js"]')) {
                 const script = document.createElement("script");
-                script.src = "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js";
+                script.src = "https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js";
                 document.head.appendChild(script);
                 
                 // Wait for script to load
@@ -95,14 +230,36 @@ async function preloadPyodide() {
             
             // Load and install required packages
             await pyodide.loadPackage("micropip");
-            await pyodide.runPythonAsync(`
-                import micropip
-                await micropip.install("qrcode")
-                await micropip.install("pillow")
-                print("All packages installed successfully")
-            `);
             
-            console.log("Pyodide and all required packages are ready");
+            // Install packages with better error handling
+            try {
+                await pyodide.runPythonAsync(`
+                    import micropip
+                    print("Installing qrcode package...")
+                    await micropip.install("qrcode")
+                    print("Installing pillow package...")
+                    await micropip.install("pillow")
+                    print("All packages installed successfully")
+                `);
+                
+                // Notify service worker about successful package loading
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'CACHE_PACKAGE',
+                        packageName: 'qrcode'
+                    });
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'CACHE_PACKAGE',
+                        packageName: 'pillow'
+                    });
+                }
+                
+            } catch (packageError) {
+                console.warn("Some packages may not have installed correctly:", packageError);
+                // Continue anyway as basic functionality might still work
+            }
+            
+            console.log("Pyodide and required packages are ready");
             return pyodide;
         } catch (error) {
             console.error("Failed to preload Pyodide:", error);
@@ -334,10 +491,90 @@ function hideLoader(loaderId) {
     }
 }
 
+// Network status handling
+function initializeNetworkHandling() {
+    // Show offline indicator when offline
+    function showOfflineIndicator() {
+        if (!document.querySelector('.offline-indicator')) {
+            const offlineDiv = document.createElement('div');
+            offlineDiv.className = 'offline-indicator';
+            offlineDiv.innerHTML = '🔌 Offline Mode - Using cached resources';
+            document.body.appendChild(offlineDiv);
+        }
+    }
+    
+    // Hide offline indicator when online
+    function hideOfflineIndicator() {
+        const offlineDiv = document.querySelector('.offline-indicator');
+        if (offlineDiv) {
+            offlineDiv.remove();
+        }
+    }
+    
+    // Initial check
+    if (!navigator.onLine) {
+        showOfflineIndicator();
+    }
+    
+    // Listen for network changes
+    window.addEventListener('online', () => {
+        console.log('Back online');
+        hideOfflineIndicator();
+    });
+    
+    window.addEventListener('offline', () => {
+        console.log('Gone offline');
+        showOfflineIndicator();
+    });
+}
+
+// Enhanced error handling for PWA
+function showUserFriendlyError(message, isNetworkError = false) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-notification';
+    errorDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #f44336;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        z-index: 1002;
+        max-width: 90%;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    `;
+    
+    const icon = isNetworkError ? '🌐' : '❌';
+    errorDiv.innerHTML = `
+        <div style="font-size: 24px; margin-bottom: 10px;">${icon}</div>
+        <div style="margin-bottom: 15px;">${message}</div>
+        <button onclick="this.parentElement.remove()" style="background: white; color: #f44336; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+            OK
+        </button>
+    `;
+    
+    document.body.appendChild(errorDiv);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (errorDiv.parentElement) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
 window.onload = function() {
     document.getElementById("qr").style.display = "none";
     document.getElementById("download-btn").style.display = "none";
     document.querySelector(".qr-section").style.display = "none";
+    
+    // Initialize PWA features
+    registerServiceWorker();
+    initializePWAInstall();
+    initializeNetworkHandling();
     
     // Check eel availability on page load (useEffect-like behavior)
     isEelAvailable = checkEelAvailability();
@@ -345,7 +582,20 @@ window.onload = function() {
     // Only preload Pyodide if eel is not available
     if (!isEelAvailable) {
         console.log("Eel not detected, preloading Pyodide for web mode...");
-        preloadPyodide().catch(err => console.warn("Preloading Pyodide failed, will retry when needed:", err));
+        document.body.classList.add('loading-pyodide');
+        
+        preloadPyodide()
+            .then(() => {
+                document.body.classList.remove('loading-pyodide');
+                console.log("Pyodide ready for offline use");
+            })
+            .catch(err => {
+                document.body.classList.remove('loading-pyodide');
+                console.warn("Preloading Pyodide failed, will retry when needed:", err);
+                if (!navigator.onLine) {
+                    showUserFriendlyError("Offline mode setup failed. Some features may not work.", true);
+                }
+            });
     } else {
         console.log("Eel detected, skipping Pyodide preload - using desktop mode");
     }

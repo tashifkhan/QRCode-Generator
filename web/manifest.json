@@ -1,0 +1,38 @@
+{
+	"name": "QR Code Generator",
+	"short_name": "QR Generator",
+	"description": "Generate QR codes for URLs, text, and UPI payments offline",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#4CAF50",
+	"orientation": "portrait-primary",
+	"scope": "/",
+	"icons": [
+		{
+			"src": "logo.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "logo.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any"
+		}
+	],
+	"categories": ["utilities", "productivity"],
+	"screenshots": [
+		{
+			"src": "logo.png",
+			"sizes": "1280x720",
+			"type": "image/png",
+			"form_factor": "wide",
+			"label": "QR Code Generator Interface"
+		}
+	],
+	"prefer_related_applications": false,
+	"related_applications": [],
+	"features": ["Cross Platform", "Fast", "Simple"]
+}

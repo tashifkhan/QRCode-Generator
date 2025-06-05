@@ -4,11 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Generate QR codes for URLs, text, and UPI payments offline with this simple PWA tool.">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="QR Generator">
+    <meta name="msapplication-TileColor" content="#4CAF50">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" href="logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js"></script>
     <script type="text/javascript" src="/eel.js"></script>
-    <meta name="description" content="Generate QR codes for URLs, text, and UPI payments with this simple tool.">
-    <link rel="icon" href="logo.png" type="image/png">
 </head>
 <body>
     <div class="container">
