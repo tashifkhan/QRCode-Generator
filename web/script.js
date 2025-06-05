@@ -155,10 +155,16 @@ function showUpdateAvailable() {
         </div>
     `;
     document.body.appendChild(updateNotification);
+    
+    // Add class to body to adjust layout
+    document.body.classList.add('has-update-notification');
 }
 
 // Refresh app to get updates
 function refreshApp() {
+    // Remove the notification class before refreshing
+    document.body.classList.remove('has-update-notification');
+    
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistration().then(registration => {
             if (registration && registration.waiting) {
@@ -175,6 +181,9 @@ function dismissUpdate() {
     if (updateNotification) {
         updateNotification.remove();
     }
+    
+    // Remove class from body to restore layout
+    document.body.classList.remove('has-update-notification');
 }
 
 // Enhanced Pyodide preloading with service worker support

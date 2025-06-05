@@ -478,11 +478,11 @@ input:checked + .toggle-slider:before {
     }
 }
 
-/* PWA install prompt - Glassmorphism style */
+/* PWA install prompt - Glassmorphism style with better alignment */
 .install-btn {
     position: fixed !important;
-    top: 20px !important;
-    right: 20px !important;
+    top: 24px !important;
+    right: 24px !important;
     background: var(--glass-bg) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
@@ -491,13 +491,15 @@ input:checked + .toggle-slider:before {
     padding: 12px 18px !important;
     border-radius: 16px !important;
     cursor: pointer !important;
-    z-index: 1000 !important;
+    z-index: 1002 !important;
     font-size: 14px !important;
     font-weight: 600 !important;
     letter-spacing: 0.5px !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     transition: all 0.3s ease !important;
     font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace !important;
+    min-width: 120px !important;
+    text-align: center !important;
 }
 
 .install-btn:hover {
@@ -506,9 +508,18 @@ input:checked + .toggle-slider:before {
     border-color: var(--secondary-color) !important;
 }
 
-/* Update notification - Glassmorphism style */
+/* Adjust install button when update notification is present */
+body.has-update-notification .install-btn {
+    top: 104px !important;
+    transition: top 0.3s ease-out !important;
+}
+
+/* Update notification - Glassmorphism style with content push */
 .update-notification {
+    position: relative;
+    width: 100%;
     animation: slideDown 0.3s ease-out;
+    margin-bottom: 0;
 }
 
 .update-notification > div {
@@ -517,15 +528,33 @@ input:checked + .toggle-slider:before {
     -webkit-backdrop-filter: blur(15px) !important;
     color: var(--text-color) !important;
     padding: 20px !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    width: 100% !important;
     z-index: 1001 !important;
     text-align: center !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace !important;
+}
+
+/* Adjust body when update notification is present */
+body.has-update-notification {
+    padding-top: 80px;
+    transition: padding-top 0.3s ease-out;
+}
+
+body.has-update-notification .container {
+    margin-top: 1rem;
+    transition: margin-top 0.3s ease-out;
+}
+
+/* Make update notification stick to top */
+.update-notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
 }
 
 .update-notification button {
@@ -727,13 +756,24 @@ input:checked + .toggle-slider:before {
         padding: 2rem 1.5rem;
     }
     
+    /* Adjust body padding for mobile when update notification is present */
+    body.has-update-notification {
+        padding-top: 70px;
+    }
+    
     /* Adjust install button for mobile */
     .install-btn {
-        top: 10px !important;
-        right: 10px !important;
+        top: 16px !important;
+        right: 16px !important;
         padding: 10px 14px !important;
         font-size: 13px !important;
         border-radius: 12px !important;
+        min-width: 100px !important;
+    }
+    
+    /* Adjust install button when update notification is present on mobile */
+    body.has-update-notification .install-btn {
+        top: 86px !important;
     }
     
     /* Update notification mobile adjustments */
