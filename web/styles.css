@@ -465,7 +465,19 @@ input:checked + .toggle-slider:before {
 
 /* PWA Specific Styles */
 
-/* Install button animation - from bottom with bounce effect */
+/* Material 3 slide in from left animation */
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Enhanced slideInFromBottom animation - bounce effect */
 @keyframes slideInFromBottom {
     0% {
         transform: translateY(120%);
@@ -497,62 +509,85 @@ input:checked + .toggle-slider:before {
     }
 }
 
-/* PWA install prompt - Bottom positioned and center-aligned */
+/* PWA install prompt - Material 3 style, left-aligned */
 .install-btn {
     position: fixed !important;
     bottom: 20px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(100, 255, 218, 0.1) 100%) !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    color: var(--secondary-color) !important;
-    border: 1px solid rgba(100, 255, 218, 0.4) !important;
-    padding: 10px 16px !important;
-    border-radius: 16px !important;
+    left: 20px !important;
+    background: var(--secondary-color) !important;
+    color: #0a192f !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 100px !important;
     cursor: pointer !important;
     z-index: 1000 !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.3px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.1px !important;
     box-shadow: 
-        0 6px 24px rgba(0, 0, 0, 0.25),
-        0 0 15px rgba(100, 255, 218, 0.15) !important;
-    transition: all 0.3s ease !important;
-    font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace !important;
-    min-width: 100px !important;
+        0 3px 1px -2px rgba(0, 0, 0, 0.2),
+        0 2px 2px 0 rgba(0, 0, 0, 0.14),
+        0 1px 5px 0 rgba(0, 0, 0, 0.12) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+    font-family: 'Roboto', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    min-width: 140px !important;
     text-align: center !important;
-    animation: slideInFromBottom 0.4s ease-out !important;
+    animation: slideInFromLeft 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
 }
 
 .install-btn:hover {
-    transform: translateX(-50%) translateY(-2px) scale(1.02) !important;
+    background: rgba(100, 255, 218, 0.9) !important;
     box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.35),
-        0 0 25px rgba(100, 255, 218, 0.3) !important;
-    border-color: var(--secondary-color) !important;
-    background: linear-gradient(135deg, rgba(100, 255, 218, 0.15) 0%, rgba(100, 255, 218, 0.25) 100%) !important;
+        0 2px 4px -1px rgba(0, 0, 0, 0.2),
+        0 4px 5px 0 rgba(0, 0, 0, 0.14),
+        0 1px 10px 0 rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-1px) !important;
 }
 
 .install-btn:active {
-    transform: translateX(-50%) translateY(-1px) scale(0.98) !important;
+    background: rgba(100, 255, 218, 0.8) !important;
+    box-shadow: 
+        0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(0) !important;
 }
 
-/* Mobile hover effects for center-aligned install button */
+/* Mobile hover effects for Material 3 install button */
 .install-btn:hover {
-    transform: translateX(-50%) translateY(-1px) scale(1.01) !important;
+    background: rgba(100, 255, 218, 0.9) !important;
+    transform: translateY(-1px) !important;
 }
 
 .install-btn:active {
-    transform: translateX(-50%) translateY(0) scale(0.99) !important;
+    background: rgba(100, 255, 218, 0.8) !important;
+    transform: translateY(0) !important;
+}
+
+/* Focus states for accessibility */
+.install-btn:focus {
+    outline: none !important;
+    box-shadow: 
+        0 2px 4px -1px rgba(0, 0, 0, 0.2),
+        0 4px 5px 0 rgba(0, 0, 0, 0.14),
+        0 1px 10px 0 rgba(0, 0, 0, 0.12),
+        0 0 0 3px rgba(100, 255, 218, 0.3) !important;
+}
+
+.install-btn:focus-visible {
+    outline: 2px solid var(--secondary-color) !important;
+    outline-offset: 2px !important;
 }
 
 /* Position install button above offline indicator when both are present */
 .offline-indicator + .install-btn,
 body.offline .install-btn {
     bottom: 85px !important;
-    transform: translateX(-50%) !important;
-    transition: bottom 0.3s ease-out, transform 0.3s ease !important;
+    transition: bottom 0.2s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
 }
 
 /* Update notification - Glassmorphism style with content push */
@@ -802,22 +837,21 @@ body.has-update-notification .container {
         padding-top: 70px;
     }
     
-    /* Adjust install button for mobile - center-aligned and smaller */
+    /* Adjust install button for mobile - Material 3 style */
     .install-btn {
-        bottom: 15px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        padding: 8px 12px !important;
-        font-size: 11px !important;
-        border-radius: 12px !important;
-        min-width: 80px !important;
+        bottom: 16px !important;
+        left: 16px !important;
+        padding: 10px 20px !important;
+        font-size: 13px !important;
+        border-radius: 100px !important;
+        min-width: 120px !important;
+        gap: 6px !important;
     }
     
     /* Position install button above offline indicator on mobile when both present */
     .offline-indicator + .install-btn,
     body.offline .install-btn {
         bottom: 75px !important;
-        transform: translateX(-50%) !important;
     }
     
     /* Update notification mobile adjustments */
@@ -944,7 +978,7 @@ body.has-update-notification .container {
 
 .brief-toast {
     position: fixed;
-    bottom: 65px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     background: var(--glass-bg);
@@ -1288,7 +1322,7 @@ body.has-update-notification .container {
 .install-btn,
 .offline-indicator,
 .brief-toast {
-    transition: bottom 0.3s ease-out, transform 0.3s ease !important;
+    transition: bottom 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
 }
 
 /* Ensure proper z-index stacking for bottom elements */
