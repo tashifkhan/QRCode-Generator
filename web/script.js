@@ -116,21 +116,6 @@ function showInstallPrompt() {
     const installButton = document.createElement('button');
     installButton.className = 'install-btn';
     installButton.innerHTML = '📱 Install App';
-    installButton.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 25px;
-        cursor: pointer;
-        z-index: 1000;
-        font-size: 14px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        animation: slideIn 0.3s ease-out;
-    `;
     
     installButton.addEventListener('click', async () => {
         if (deferredPrompt) {
@@ -163,14 +148,10 @@ function showUpdateAvailable() {
     const updateNotification = document.createElement('div');
     updateNotification.className = 'update-notification';
     updateNotification.innerHTML = `
-        <div style="background: #2196F3; color: white; padding: 15px; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; text-align: center;">
-            <span>New version available!</span>
-            <button onclick="refreshApp()" style="background: white; color: #2196F3; border: none; padding: 5px 10px; margin-left: 10px; border-radius: 3px; cursor: pointer;">
-                Update
-            </button>
-            <button onclick="dismissUpdate()" style="background: transparent; color: white; border: 1px solid white; padding: 5px 10px; margin-left: 5px; border-radius: 3px; cursor: pointer;">
-                Later
-            </button>
+        <div>
+            <span>🔄 New version available!</span>
+            <button onclick="refreshApp()">Update</button>
+            <button onclick="dismissUpdate()">Later</button>
         </div>
     `;
     document.body.appendChild(updateNotification);
@@ -532,28 +513,12 @@ function initializeNetworkHandling() {
 function showUserFriendlyError(message, isNetworkError = false) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-notification';
-    errorDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #f44336;
-        color: white;
-        padding: 20px;
-        border-radius: 8px;
-        z-index: 1002;
-        max-width: 90%;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    `;
     
     const icon = isNetworkError ? '🌐' : '❌';
     errorDiv.innerHTML = `
-        <div style="font-size: 24px; margin-bottom: 10px;">${icon}</div>
-        <div style="margin-bottom: 15px;">${message}</div>
-        <button onclick="this.parentElement.remove()" style="background: white; color: #f44336; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-            OK
-        </button>
+        <div style="font-size: 28px; margin-bottom: 15px;">${icon}</div>
+        <div style="margin-bottom: 20px; font-size: 16px; line-height: 1.4;">${message}</div>
+        <button onclick="this.parentElement.remove()">OK</button>
     `;
     
     document.body.appendChild(errorDiv);
