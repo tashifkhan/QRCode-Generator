@@ -8,44 +8,63 @@ function generateQRCode() {
     // Show loading spinner
     showLoader("main-loader");
 
-    try {
-        eel.generate_qr_web(data)(function(base64) {
-            // Hide loader
-            hideLoader("main-loader");
-            
-            console.log(base64);
-            if (base64) {
-                setImage(base64);
-            } else {
-                alert("Failed to generate QR code");
-            }
-        });
-    } catch (error) {
-        if (error instanceof ReferenceError && error.message.includes("eel")) {
-            generateQRWithPyodide(data)
-                .then(base64 => {
-                    // Hide loader
-                    hideLoader("main-loader");
+    // Use eel if available, otherwise use Pyodide
+    if (isEelAvailable) {
+        try {
+            eel.generate_qr_web(data)(function(base64) {
+                // Hide loader
+                hideLoader("main-loader");
+                
+                console.log(base64);
+                if (base64) {
                     setImage(base64);
-                })
-                .catch(err => {
-                    // Hide loader
-                    hideLoader("main-loader");
-                    console.error("Error with Pyodide fallback:", err);
-                    alert("Failed to generate QR code: " + err.message);
-                });
-        } else {
+                } else {
+                    alert("Failed to generate QR code");
+                }
+            });
+        } catch (error) {
             // Hide loader
             hideLoader("main-loader");
-            console.error("Error generating QR code:", error);
+            console.error("Error generating QR code with eel:", error);
             alert("Failed to generate QR code: " + error.message);
         }
+    } else {
+        // Use Pyodide fallback
+        generateQRWithPyodide(data)
+            .then(base64 => {
+                // Hide loader
+                hideLoader("main-loader");
+                setImage(base64);
+            })
+            .catch(err => {
+                // Hide loader
+                hideLoader("main-loader");
+                console.error("Error with Pyodide fallback:", err);
+                alert("Failed to generate QR code: " + err.message);
+            });
     }
 }
 
 // Global variables to track Pyodide loading
 let pyodideReadyPromise = null;
 let isPyodideLoading = false;
+let isEelAvailable = false;
+
+// Function to check if eel is available
+function checkEelAvailability() {
+    try {
+        // Check if eel object exists and has the expected methods
+        if (typeof eel !== 'undefined' && 
+            eel.generate_qr_web && 
+            typeof eel.generate_qr_web === 'function') {
+            console.log("Eel is available - desktop mode");
+            return true;
+        }
+    } catch (error) {
+        console.log("Eel is not available - web mode");
+    }
+    return false;
+}
 
 // Function to preload Pyodide and required packages
 async function preloadPyodide() {
@@ -168,39 +187,41 @@ function generateURLQR() {
     // Show loading spinner
     showLoader("url-loader");
     
-    try {
-        eel.generate_qr_web(urlText)(function(base64) {
-            // Hide loader
-            hideLoader("url-loader");
-            
-            if (base64) {
-                setImage(base64, urlText);
-                closeModal("urlModal");
-            } else {
-                alert("Failed to generate QR code");
-            }
-        });
-    } catch (error) {
-        if (error instanceof ReferenceError && error.message.includes("eel")) {
-            generateQRWithPyodide(urlText)
-                .then(base64 => {
-                    // Hide loader
-                    hideLoader("url-loader");
+    // Use eel if available, otherwise use Pyodide
+    if (isEelAvailable) {
+        try {
+            eel.generate_qr_web(urlText)(function(base64) {
+                // Hide loader
+                hideLoader("url-loader");
+                
+                if (base64) {
                     setImage(base64, urlText);
                     closeModal("urlModal");
-                })
-                .catch(err => {
-                    // Hide loader
-                    hideLoader("url-loader");
-                    console.error("Error with Pyodide fallback:", err);
-                    alert("Failed to generate QR code: " + err.message);
-                });
-        } else {
+                } else {
+                    alert("Failed to generate QR code");
+                }
+            });
+        } catch (error) {
             // Hide loader
             hideLoader("url-loader");
-            console.error("Error generating URL QR code:", error);
+            console.error("Error generating URL QR code with eel:", error);
             alert("Failed to generate QR code: " + error.message);
         }
+    } else {
+        // Use Pyodide fallback
+        generateQRWithPyodide(urlText)
+            .then(base64 => {
+                // Hide loader
+                hideLoader("url-loader");
+                setImage(base64, urlText);
+                closeModal("urlModal");
+            })
+            .catch(err => {
+                // Hide loader
+                hideLoader("url-loader");
+                console.error("Error with Pyodide fallback:", err);
+                alert("Failed to generate QR code: " + err.message);
+            });
     }
 }
 
@@ -232,44 +253,45 @@ function generateUPIQR() {
     // Show loading spinner
     showLoader("upi-loader");
     
-    try {
-        eel.generate_upi_qr_web(upiId, displayName, amount)(function(base64) {
-            // Hide loader
-            hideLoader("upi-loader");
-            
-            if (base64) {
-                let filename = `upi-${upiId.replace('@', '-')}`;
-                setImage(base64, filename);
-                closeModal("upiModal");
-            } else {
-                alert("Failed to generate UPI QR code");
-            }
-        });
-    } catch (error) {
-        if (error instanceof ReferenceError && error.message.includes("eel")) {
-            // Generate UPI QR code with Pyodide
-            const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(displayName)}${amount ? '&am=' + encodeURIComponent(amount) : ''}`;
-            
-            generateQRWithPyodide(upiString)
-                .then(base64 => {
-                    // Hide loader
-                    hideLoader("upi-loader");
+    // Use eel if available, otherwise use Pyodide
+    if (isEelAvailable) {
+        try {
+            eel.generate_upi_qr_web(upiId, displayName, amount)(function(base64) {
+                // Hide loader
+                hideLoader("upi-loader");
+                
+                if (base64) {
                     let filename = `upi-${upiId.replace('@', '-')}`;
                     setImage(base64, filename);
                     closeModal("upiModal");
-                })
-                .catch(err => {
-                    // Hide loader
-                    hideLoader("upi-loader");
-                    console.error("Error with Pyodide fallback:", err);
-                    alert("Failed to generate UPI QR code: " + err.message);
-                });
-        } else {
+                } else {
+                    alert("Failed to generate UPI QR code");
+                }
+            });
+        } catch (error) {
             // Hide loader
             hideLoader("upi-loader");
-            console.error("Error generating UPI QR code:", error);
+            console.error("Error generating UPI QR code with eel:", error);
             alert("Failed to generate UPI QR code: " + error.message);
         }
+    } else {
+        // Generate UPI QR code with Pyodide
+        const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(displayName)}${amount ? '&am=' + encodeURIComponent(amount) : ''}`;
+        
+        generateQRWithPyodide(upiString)
+            .then(base64 => {
+                // Hide loader
+                hideLoader("upi-loader");
+                let filename = `upi-${upiId.replace('@', '-')}`;
+                setImage(base64, filename);
+                closeModal("upiModal");
+            })
+            .catch(err => {
+                // Hide loader
+                hideLoader("upi-loader");
+                console.error("Error with Pyodide fallback:", err);
+                alert("Failed to generate UPI QR code: " + err.message);
+            });
     }
 }
 
@@ -317,8 +339,16 @@ window.onload = function() {
     document.getElementById("download-btn").style.display = "none";
     document.querySelector(".qr-section").style.display = "none";
     
-    // Start preloading Pyodide in the background
-    preloadPyodide().catch(err => console.warn("Preloading Pyodide failed, will retry when needed:", err));
+    // Check eel availability on page load (useEffect-like behavior)
+    isEelAvailable = checkEelAvailability();
+    
+    // Only preload Pyodide if eel is not available
+    if (!isEelAvailable) {
+        console.log("Eel not detected, preloading Pyodide for web mode...");
+        preloadPyodide().catch(err => console.warn("Preloading Pyodide failed, will retry when needed:", err));
+    } else {
+        console.log("Eel detected, skipping Pyodide preload - using desktop mode");
+    }
     
     // Toggle functionality for amount field
     const amountToggle = document.getElementById("amount-toggle");
