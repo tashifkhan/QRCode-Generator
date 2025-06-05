@@ -509,25 +509,25 @@ input:checked + .toggle-slider:before {
     }
 }
 
-/* PWA install prompt - Material 3 style, left-aligned, compact */
+/* PWA install prompt - Material 3 style, left-aligned, easily spotted */
 .install-btn {
     position: fixed !important;
     bottom: 20px !important;
     left: 20px !important;
     background: var(--secondary-color) !important;
-    color: #0a192f !important;
+    color: var(--background-color) !important;
     border: none !important;
-    padding: 8px 16px !important;
+    padding: 10px 20px !important;
     border-radius: 100px !important;
     cursor: pointer !important;
     z-index: 1000 !important;
-    font-size: 12px !important;
-    font-weight: 500 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
     letter-spacing: 0.1px !important;
     box-shadow: 
-        0 3px 1px -2px rgba(0, 0, 0, 0.2),
-        0 2px 2px 0 rgba(0, 0, 0, 0.14),
-        0 1px 5px 0 rgba(0, 0, 0, 0.12) !important;
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 2px 4px -1px rgba(0, 0, 0, 0.16),
+        0 1px 8px 0 var(--secondary-color) !important;
     transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
     font-family: 'Roboto', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif !important;
     min-width: auto !important;
@@ -537,36 +537,36 @@ input:checked + .toggle-slider:before {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;
+    gap: 7px !important;
     white-space: nowrap !important;
 }
 
 .install-btn:hover {
-    background: rgba(100, 255, 218, 0.9) !important;
+    background: var(--secondary-color) !important;
     box-shadow: 
-        0 2px 4px -1px rgba(0, 0, 0, 0.2),
-        0 4px 5px 0 rgba(0, 0, 0, 0.14),
-        0 1px 10px 0 rgba(0, 0, 0, 0.12) !important;
-    transform: translateY(-1px) !important;
+        0 6px 8px -1px rgba(0, 0, 0, 0.3),
+        0 4px 6px 0 rgba(0, 0, 0, 0.18),
+        0 2px 12px 0 var(--secondary-color) !important;
+    transform: translateY(-2px) !important;
 }
 
 .install-btn:active {
-    background: rgba(100, 255, 218, 0.8) !important;
+    background: var(--secondary-color) !important;
     box-shadow: 
-        0 5px 5px -3px rgba(0, 0, 0, 0.2),
-        0 8px 10px 1px rgba(0, 0, 0, 0.14),
-        0 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 2px 4px 0 rgba(0, 0, 0, 0.16),
+        0 1px 8px 0 var(--secondary-color) !important;
     transform: translateY(0) !important;
 }
 
 /* Mobile hover effects for Material 3 install button */
 .install-btn:hover {
-    background: rgba(100, 255, 218, 0.9) !important;
-    transform: translateY(-1px) !important;
+    background: var(--secondary-color) !important;
+    transform: translateY(-2px) !important;
 }
 
 .install-btn:active {
-    background: rgba(100, 255, 218, 0.8) !important;
+    background: var(--secondary-color) !important;
     transform: translateY(0) !important;
 }
 
@@ -574,10 +574,10 @@ input:checked + .toggle-slider:before {
 .install-btn:focus {
     outline: none !important;
     box-shadow: 
-        0 2px 4px -1px rgba(0, 0, 0, 0.2),
-        0 4px 5px 0 rgba(0, 0, 0, 0.14),
-        0 1px 10px 0 rgba(0, 0, 0, 0.12),
-        0 0 0 3px rgba(100, 255, 218, 0.3) !important;
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 2px 4px 0 rgba(0, 0, 0, 0.16),
+        0 1px 8px 0 var(--secondary-color),
+        0 0 0 3px rgba(100, 255, 218, 0.4) !important;
 }
 
 .install-btn:focus-visible {
